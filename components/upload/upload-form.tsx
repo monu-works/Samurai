@@ -28,8 +28,12 @@ export default function UploadForm() {
     onClientUploadComplete: () => {
       toast.success("✅ Upload successful! AI will summarize shortly.");
     },
-    onUploadError: () => {
-      toast.error("❌ Upload failed. Please try again.");
+    onUploadError: (error) => {
+      console.error("UPLOADTHING ERROR 👉", error);
+      toast.error(error.message || "Upload failed");
+    },
+    onUploadProgress: (progress) => {
+      console.log("UPLOADTHING PROGRESS 👉", progress);
     },
     onUploadBegin: () => {
       toast("📤 Upload started...");
