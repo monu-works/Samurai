@@ -3,6 +3,7 @@
 import { fetchAndExtractPdfText } from "@/lib/langchain";
 import { generateSummaryFromOpenAI } from "@/lib/openai";
 import { generateSummaryFromGemini } from "@/lib/gemini";
+import { generateSummaryFromHuggingFace } from "@/lib/huggingface";
 import { getDbConnection } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { formatFileNameAsTitle } from "@/utils/format-utils";
@@ -38,9 +39,15 @@ export async function generateSummary(uploadResponse: {
     try {
       summary = await generateSummaryFromOpenAI(pdfText);
     } catch (error) {
-      if (error instanceof Error && error.message === "RATE_LIMIT_EXCEEDED") {
-        summary = await generateSummaryFromGemini(pdfText);
-      } else {
+      // if (error instanceof Error && error.message === "RATE_LIMIT_EXCEEDED") {
+      //   summary = await generateSummaryFromGemini(pdfText);
+      // } else {
+      //   return { success: false, message: "AI summary failed.", data: null };
+      // }
+      try {
+        summary = await generateSummaryFromHuggingFace(pdfText);
+      } catch (hfError) {
+        console.log("HuggingFace also failed:", hfError);
         return { success: false, message: "AI summary failed.", data: null };
       }
     }
